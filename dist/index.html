@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Oxford Discover Futures 1 · Ebook</title>
+  <meta name="description" content="Đọc Oxford Discover Futures Level 1, nghe audio và xem video theo bài học.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b2747'/%3E%3Cpath d='M7 8h8v17H7zm10 0h8v17h-8' fill='%2345d2d7'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css"><script src="media.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+ <a class="skip" href="#reader">Đến trang sách</a>
+ <header class="topbar"><button id="menu" class="icon-btn" aria-label="Mở mục lục" aria-expanded="false">☰</button><div class="brand"><span class="brand-mark">1</span><div><strong>Oxford Discover Futures</strong><span>LEVEL 1 <b>·</b> STUDENT BOOK</span></div></div><button id="media-open" class="primary">Nghe &amp; xem</button></header>
+ <div class="layout">
+  <aside id="sidebar" aria-label="Mục lục"><div class="side-heading"><span>MỤC LỤC</span><button id="contents">Xem bản gốc</button></div><nav id="chapters"></nav><div class="sidebar-foot">Oxford Discover Futures · Level 1<br>Chọn bài để đến trang sách.</div></aside>
+  <main id="reader">
+   <div class="reader-heading"><div><p id="section-label">STUDENT BOOK</p><h1 id="section-title">What is the value of time?</h1></div><span class="book-tag">Sách học sinh</span></div>
+   <div class="toolbar"><div class="paging"><button id="prev" aria-label="Trang trước">‹</button><label for="page">Trang</label><select id="page" aria-label="Chọn trang sách"></select><button id="next" aria-label="Trang sau">›</button></div><div class="zoom"><button id="zoom-out" aria-label="Thu nhỏ">−</button><button id="zoom-reset" title="Vừa khung">Vừa khung</button><button id="zoom-in" aria-label="Phóng to">+</button></div></div>
+   <div id="page-stage" tabindex="0" aria-label="Trang sách. Dùng phím mũi tên trái và phải để chuyển trang."><div id="page-wrap"><img id="page-image" src="pages/005.webp" alt="Student Book, trang sách 4" width="1500" height="2122"><p id="image-error" hidden>Chưa tải được trang sách. <button id="retry">Thử lại</button></p></div></div>
+   <div class="reader-footer"><span id="page-status" aria-live="polite">Trang sách 4</span><span>Phím ‹ › để chuyển trang · Chạm + để phóng to</span></div>
+  </main>
+  <aside id="resources" aria-label="Audio và video"><div class="resource-header"><div><span class="eyebrow">HỌC CÙNG SÁCH</span><h2>Nghe &amp; xem</h2></div><button id="resources-close" aria-label="Đóng danh sách media">×</button></div><section><div class="section-row"><h3>Video</h3><span id="video-unit">Unit 1</span></div><div id="video-list"></div></section><section class="audio-section"><h3>Audio</h3><p class="hint">Chọn mã audio được in bên cạnh bài tập.</p><label class="sr-only" for="audio-search">Tìm mã audio</label><input id="audio-search" inputmode="decimal" type="search" placeholder="Tìm mã, ví dụ 1.01" autocomplete="off"><div id="audio-list"></div><p id="audio-empty" hidden>Không có mã audio này.</p></section><p class="drive-note">Audio và video phát từ Google Drive trong cửa sổ nhỏ.</p></aside>
+ </div>
+ <div id="scrim" hidden></div>
+ <dialog id="player" aria-labelledby="player-title"><div class="dialog-heading"><div><span class="eyebrow" id="player-kind">AUDIO</span><h2 id="player-title">Audio 1.01</h2></div><button id="player-close" aria-label="Đóng và dừng phát">×</button></div><div id="player-host"></div><div class="dialog-footer"><span>Nếu không phát được, mở trực tiếp trên Drive.</span><a id="drive-link" href="https://drive.google.com" target="_blank" rel="noopener noreferrer">Mở Google Drive</a></div></dialog>
+</body></html>
