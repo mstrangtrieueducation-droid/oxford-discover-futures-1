@@ -13,6 +13,7 @@ Push this directory to a GitHub repository with the default branch `main`. In Se
 ## Content
 
 - 154 optimized WebP page images, preserving the supplied book layout.
+- Presentation layout: full-width reading area, on-demand contents/media drawers, hideable toolbar and fullscreen control. Choose fit-width for large text or fit-page for the whole page; H toggles controls, F toggles fullscreen, arrows turn pages.
 - 10 unit navigation entries; page numbers match the printed book where present.
 - 65 Student Book audio entries (64 tracks and the copyright recording).
 - 31 videos mapped by the Unit number in their filenames.
