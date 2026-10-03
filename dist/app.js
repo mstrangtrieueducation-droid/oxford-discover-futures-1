@@ -6,7 +6,7 @@ let book='sb',page=5,testUnit=1,zoom=1,lastFocus=null,noticeTimer;
 const save=(k,v)=>{try{localStorage.setItem(k,v)}catch{}};
 const read=k=>{try{return localStorage.getItem(k)}catch{return null}};
 const total=()=>book==='sb'?154:book==='wb'?L.workbookPages:L.tests[testUnit].pages;
-const label=n=>n===1&&book!=='test'?'Bìa':book==='sb'?(n===154?'Trang cuối':String(n-1)):String(n);
+const label=n=>n===1&&book!=='test'?'Cover':book==='sb'?(n===154?'Last page':String(n-1)):String(n);
 const bookName=()=>book==='sb'?'Student Book':book==='wb'?'Workbook':'Unit Test '+testUnit;
 const pagePath=n=>(book==='sb'?'pages-original/':book==='wb'?'workbook-original/':'tests/'+testUnit+'/')+String(n).padStart(3,'0')+(book==='test'?'.webp':'.jpg');
 const unit=()=>book==='test'?testUnit:book==='wb'?Math.min(10,Math.max(1,Math.floor((page-4)/10)+1)):([...chapters].reverse().find(c=>page-1>=c[1])||chapters[0])[0];
@@ -28,14 +28,14 @@ function switchBook(next,n,u=unit()){
 function go(n,updateHash=true){
  n=Number(n);if(!Number.isInteger(n)||n<1||n>total())return;page=n;
  const u=unit();$('page').value=page;$('section-label').textContent=bookName();$('section-title').textContent=chapters[u-1][2];
- $('page-image').dataset.fallback='false';$('page-image').src=pagePath(page);$('page-image').alt=bookName()+' · Trang '+label(page);$('image-error').hidden=true;
- $('page-status').textContent=bookName()+' · Trang '+label(page)+' · '+page+'/'+total();
+ $('page-image').dataset.fallback='false';$('page-image').src=pagePath(page);$('page-image').alt=bookName()+' · Page '+label(page);$('image-error').hidden=true;
+ $('page-status').textContent=bookName()+' · Page '+label(page)+' · '+page+'/'+total();
  $('prev').disabled=page===1;$('next').disabled=page===total();$('unit-test').textContent='Test U'+u;
  $('answers-open').disabled=book==='wb'&&(page<4||page>=114);
  document.querySelectorAll('.chapter[data-unit]').forEach(b=>{if(Number(b.dataset.unit)===u)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
  $('page-stage').scrollTo(0,0);save('odf1-'+book+'-page',page);if(book==='sb')save('odf1-page',page);
  if(updateHash)history.replaceState(null,'','#'+(book==='sb'?'':'book='+book+'&')+(book==='test'?'unit='+testUnit+'&':'')+'page='+page);
- renderMedia();prepareInlineAudio();renderLessonBar();if(page<total()){const im=new Image();im.src=pagePath(page+1)}
+ renderMedia();prepareInlineAudio();renderHotspots();renderLessonBar();if(page<total()){const im=new Image();im.src=pagePath(page+1)}
 }
 function renderNavigation(){
  $('chapters').replaceChildren();
@@ -46,20 +46,20 @@ function renderNavigation(){
 function renderMedia(){
  const u=unit();$('video-unit').textContent='Unit '+u;$('video-list').replaceChildren();$('video-list').closest('section').hidden=book!=='sb';
  if(book==='sb')EBOOK_MEDIA.video.filter(v=>v.unit===u).sort((a,b)=>a.label.localeCompare(b.label)).forEach(v=>$('video-list').append(button('▶ '+v.label,()=>openMedia(v.id,v.label+' · Unit '+u,'video'),'media-button')));
- $('resources').querySelector('h2').textContent=book==='test'?'Nghe Unit Test '+u:bookName()+' · Nghe & xem';renderAudio();
+ $('resources').querySelector('h2').textContent=book==='test'?'Unit Test audio '+u:bookName()+' · Audio & video';renderAudio();
 }
 function renderAudio(){
  const q=$('audio-search').value.trim().toLowerCase();
  let list=book==='sb'?EBOOK_MEDIA.audio:book==='wb'?L.workbookAudio:[{id:L.tests[testUnit].audio,code:'3.'+String(testUnit).padStart(2,'0')}];
  if(book==='wb')list=[...list].sort((a,b)=>Number(b.code.startsWith(unit()+'.'))-Number(a.code.startsWith(unit()+'.'))||a.code.localeCompare(b.code,undefined,{numeric:true}));
  list=list.filter(a=>a.code.toLowerCase().includes(q));$('audio-list').replaceChildren();
- list.forEach(a=>{const b=button('▶ '+a.code,()=>openMedia(a.id,bookName()+' · Audio '+a.code,'audio'),'audio-button');b.setAttribute('aria-label','Nghe audio '+a.code);$('audio-list').append(b)});$('audio-empty').hidden=list.length>0;
+ list.forEach(a=>{const b=button('▶ '+a.code,()=>openMedia(a.id,bookName()+' · Audio '+a.code,'audio'),'audio-button');b.setAttribute('aria-label','Play audio '+a.code);$('audio-list').append(b)});$('audio-empty').hidden=list.length>0;
 }
 function openMedia(id,title,kind){
  if(kind==='audio'){selectInlineAudio(id);closePanels();return}
  closeInlineAudio();
  closePanels();lastFocus=$('media-open');$('player').className=kind;$('player-title').textContent=title;$('player-kind').textContent=kind.toUpperCase()+' · GOOGLE DRIVE';$('drive-link').href='https://drive.google.com/file/d/'+id+'/view';
- const frame=document.createElement('iframe');frame.src='https://drive.google.com/file/d/'+id+'/preview';frame.title=title;frame.allow='autoplay; fullscreen';frame.allowFullscreen=true;$('player-host').replaceChildren(frame);$('player').showModal();$('player-close').focus();
+ const frame=document.createElement('iframe');frame.src='https://drive.google.com/file/d/'+id+'/preview?hl=en';frame.title=title;frame.allow='autoplay; fullscreen';frame.allowFullscreen=true;$('player-host').replaceChildren(frame);$('player').showModal();$('player-close').focus();
 }
 function stopMedia(){$('player-host').replaceChildren();if(lastFocus?.isConnected)lastFocus.focus()}
 function closePanels(){
@@ -82,46 +82,62 @@ function setZoom(n,point){
  $('zoom-reset').textContent=Math.round(zoom*100)+'%';$('zoom-out').disabled=zoom===.5;$('zoom-in').disabled=zoom===3;
 }
 function setControlsHidden(h){closePanels();document.body.classList.toggle('controls-hidden',h);$('show-controls').hidden=!h;applyZoom();$(h?'page-stage':'hide-controls').focus()}
-async function toggleFullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else throw Error()}catch{notice('Trình duyệt chưa bật được toàn màn hình. Cô có thể bấm Ẩn để dành thêm chỗ cho sách.')}}
+async function toggleFullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else throw Error()}catch{notice('Fullscreen is unavailable in this browser. Use Hide to give the book more space.')}}
 function notice(text){$('notice').textContent=text;$('notice').hidden=false;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$('notice').hidden=true,7000)}
 function openAnswers(){
  if(book==='sb')return;closePanels();$('answer-section').replaceChildren();
  if(book==='wb'){
-  L.workbookAnswers.forEach((s,i)=>{const end=(L.workbookAnswers[i+1]?.page||114)-1;$('answer-section').append(option(i,'Trang '+s.page+(end>s.page?'–'+end:'')+' · '+s.title))});
+  L.workbookAnswers.forEach((s,i)=>{const end=(L.workbookAnswers[i+1]?.page||114)-1;$('answer-section').append(option(i,'Page '+s.page+(end>s.page?'–'+end:'')+' · '+s.title))});
   const idx=L.workbookAnswers.findLastIndex(s=>s.page<=page);$('answer-section').value=Math.max(0,idx);
- }else{for(let u=1;u<=10;u++)$('answer-section').append(option(u,'Unit Test '+u+' · Đáp án & lời thoại'));$('answer-section').value=testUnit}
+ }else{for(let u=1;u<=10;u++)$('answer-section').append(option(u,'Unit Test '+u+' · Answer key & scripts'));$('answer-section').value=testUnit}
  renderAnswers();$('answers').showModal();$('answers-close').focus();
 }
 function renderAnswers(){
  const s=book==='wb'?L.workbookAnswers[Number($('answer-section').value)]:null;
  const paths=s?s.images:C.testAnswers[$('answer-section').value];
- $('answers-title').textContent=s?'Workbook · '+s.title+' · Trang '+s.page:'Unit Test '+$('answer-section').value+' · Đáp án';
- $('answer-images').replaceChildren();paths.forEach((path,i)=>{const im=document.createElement('img');im.src=path;im.alt=$('answers-title').textContent+' · phần '+(i+1);im.loading='lazy';$('answer-images').append(im)});$('answers').scrollTop=0;
+ $('answers-title').textContent=s?'Workbook · '+s.title+' · Page '+s.page:'Unit Test '+$('answer-section').value+' · Answer key';
+ $('answer-images').replaceChildren();paths.forEach((path,i)=>{const im=document.createElement('img');im.src=path;im.alt=$('answers-title').textContent+' · part '+(i+1);im.loading='lazy';$('answer-images').append(im)});$('answers').scrollTop=0;
 }
 function showNav(lessons){$('chapters').hidden=lessons;$('lessons').hidden=!lessons;$('nav-units').setAttribute('aria-pressed',String(!lessons));$('nav-lessons').setAttribute('aria-pressed',String(lessons))}
 function renderLessons(){
  $('lesson-list').replaceChildren();const filter=$('lesson-unit').value;
  C.lessons.filter(l=>filter==='all'||String(l.unit||'extra')===filter).forEach(l=>{
   const card=document.createElement('article');card.className='lesson-card';
-  const h=document.createElement('h3');h.textContent='Buổi '+l.number+(l.unit?' · Unit '+l.unit:'');card.append(h);
-  card.append(button('Bắt đầu buổi '+l.number,()=>startLesson(l.number),'lesson-start'));
-  const review=document.createElement('div');review.className='lesson-review-block';const rh=document.createElement('h4');rh.textContent='1. Đầu giờ · Chữa Workbook buổi trước';review.append(rh);
+  const h=document.createElement('h3');h.textContent='Lesson '+l.number+(l.unit?' · Unit '+l.unit:'');card.append(h);
+  card.append(button('Start lesson '+l.number,()=>startLesson(l.number),'lesson-start'));
+  const review=document.createElement('div');review.className='lesson-review-block';const rh=document.createElement('h4');rh.textContent='1. Warm-up · Review previous Workbook homework';review.append(rh);
   const previous=C.lessons.find(x=>x.number===l.number-1);const reviewLinks=document.createElement('div');reviewLinks.className='lesson-links';
   if(previous?.workbook.length)previous.workbook.forEach(n=>reviewLinks.append(button('WB '+n,()=>{activeLesson=l.number;lessonPhase='review';switchBook('wb',n);saveLesson()})));
-  else{const empty=document.createElement('p');empty.textContent=l.number===1?'Buổi đầu tiên: chưa có bài tập buổi trước.':'Program chưa ghi trang Workbook giao ở buổi trước.';review.append(empty)}
+  else{const empty=document.createElement('p');empty.textContent=l.number===1?'First lesson: no previous homework to review.':'No previous Workbook assignment is specified in the program.';review.append(empty)}
   review.append(reviewLinks);card.append(review);
-  const p=document.createElement('p');p.textContent='2. Bài học · '+l.title;card.append(p);
+  const p=document.createElement('p');p.textContent='2. Lesson · '+l.title;card.append(p);
   const links=document.createElement('div');links.className='lesson-links';
   l.studentPdf.forEach(n=>links.append(button('SB '+(n-1),()=>switchBook('sb',n))));
   if(l.unit&&l.stage===0&&!l.studentPdf.length)links.append(button('Student Book',()=>switchBook('sb',chapters[l.unit-1][1]+1)));
-  if(l.unit&&l.stage>=4)links.append(button(l.stage===4?'Mở Unit Test':'Chữa Unit Test',()=>switchBook('test',1,l.unit)));
+  if(l.unit&&l.stage>=4)links.append(button(l.stage===4?'Open Unit Test':'Review Unit Test',()=>switchBook('test',1,l.unit)));
   if(l.unit&&l.stage===5&&l.number!==56){const lit={6:138,18:142,30:146,44:150}[l.number];if(lit)links.append(button('Literature',()=>switchBook('sb',lit+1)))}
   card.append(links);
-  if(l.homework){const hw=document.createElement('p');hw.className='hint';hw.textContent='3. BTVN hôm nay: '+l.homework+' · chữa đầu buổi '+(l.number+1);card.append(hw);const ws=document.createElement('div');ws.className='lesson-links';l.workbook.forEach(n=>ws.append(button('WB '+n,()=>switchBook('wb',n))));card.append(ws)}
-  const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Ghi chú Program gốc';detail.append(summary);const note=document.createElement('p');note.textContent=l.number===56?'UNIT 9 TEST RETURN':l.original;detail.append(note);card.append(detail);$('lesson-list').append(card);
+  if(l.homework){const hw=document.createElement('p');hw.className='hint';hw.textContent='3. Homework: '+l.homework+' · review at the start of lesson '+(l.number+1);card.append(hw);const ws=document.createElement('div');ws.className='lesson-links';l.workbook.forEach(n=>ws.append(button('WB '+n,()=>switchBook('wb',n))));card.append(ws)}
+  const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Original program notes';detail.append(summary);const note=document.createElement('p');note.textContent=l.number===56?'UNIT 9 TEST RETURN':l.original;detail.append(note);card.append(detail);$('lesson-list').append(card);
  });
 }
-let activeLesson=null,lessonPhase='review',inlineScope='',inlineTrack='',inlineOpen=true;
+let activeLesson=null,lessonPhase='review',inlineScope='',inlineTrack='',inlineOpen=false,audioOpener=null;
+function renderHotspots(){
+ const spots=window.EBOOK_HOTSPOTS[book]?.[book==='test'?testUnit+'-'+page:page]||[];
+ const host=$('page-hotspots');host.replaceChildren();
+ let firstAudio=null;
+ spots.forEach(s=>{
+  const media=s.kind==='audio'?inlineTracks().find(t=>t.code===s.code):EBOOK_MEDIA.video.find(v=>v.unit===s.unit&&v.label===s.label);
+  const title=s.kind==='audio'?'Audio '+s.code:s.label+' · Unit '+s.unit;
+  const b=button('',()=>{if(!media){notice('Audio '+s.code+' is not included in the supplied media files.');return}audioOpener=b;openMedia(media.id,title,s.kind)},'page-hotspot '+s.kind+(book!=='sb'||page>=113&&page<=132?' compact':''));
+  b.style.left=s.x+'%';b.style.top=s.y+'%';b.title=media?'Play '+title:title+' · File not supplied';b.setAttribute('aria-label',b.title);
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
+  if(!media){b.classList.add('unavailable');b.textContent='!';b.setAttribute('aria-disabled','true')}
+  host.append(b);if(s.kind==='audio'&&media&&!firstAudio)firstAudio=media;
+ });
+ // Preload only the first matching page track, out of view, without autoplay.
+ if(!inlineOpen){if(firstAudio)loadInlineTrack(firstAudio.id);else{$('audio-inline-host').replaceChildren();inlineTrack=''}}
+}
 function saveLesson(){save('odf1-active-lesson',activeLesson||'');save('odf1-lesson-phase',lessonPhase)}
 function lessonData(){return C.lessons.find(l=>l.number===activeLesson)}
 function reviewPages(l){return C.lessons.find(p=>p.number===l.number-1)?.workbook||[]}
@@ -138,13 +154,13 @@ function startLesson(n){activeLesson=Number(n);lessonPhase=activeLesson===1?'mai
 function openLessonPhase(phase){
  lessonPhase=phase;const l=lessonData();if(!l)return;saveLesson();const targets=lessonTargets(l);
  if(targets.length){const t=targets[0];switchBook(t.book,t.page,t.unit||l.unit||1)}
- else{closePanels();renderLessonBar();notice(phase==='review'?'Program chưa ghi trang Workbook của buổi trước. Cô có thể chọn trang Workbook để chữa.':phase==='homework'?'Program chưa ghi bài tập về nhà cho buổi này.':l.title)}
+ else{closePanels();renderLessonBar();notice(phase==='review'?'The program does not specify the previous Workbook assignment. Select a Workbook page to review.':phase==='homework'?'No homework is specified for this lesson in the program.':l.title)}
 }
 function renderLessonBar(){
  const l=lessonData();$('lesson-bar').hidden=!l;if(!l)return;$('active-lesson').value=l.number;
  for(const [id,phase] of [['lesson-review','review'],['lesson-main','main'],['lesson-homework','homework']])$(id).setAttribute('aria-pressed',String(lessonPhase===phase));
  const targets=lessonTargets(l);$('lesson-pages').replaceChildren();
- if(!targets.length){const span=document.createElement('span');span.textContent=lessonPhase==='review'?'Chưa ghi trang WB buổi trước':lessonPhase==='homework'?'Chưa ghi BTVN':l.title;$('lesson-pages').append(span);if(lessonPhase==='review')$('lesson-pages').append(button('Mở Workbook',()=>switchBook('wb',Number(read('odf1-wb-page'))||4)))}
+ if(!targets.length){const span=document.createElement('span');span.textContent=lessonPhase==='review'?'Previous WB pages not specified':lessonPhase==='homework'?'Homework not specified':l.title;$('lesson-pages').append(span);if(lessonPhase==='review')$('lesson-pages').append(button('Open Workbook',()=>switchBook('wb',Number(read('odf1-wb-page'))||4)))}
  targets.forEach(t=>{const b=button(t.label,()=>switchBook(t.book,t.page,t.unit||l.unit||1));if(book===t.book&&page===t.page&&(t.book!=='test'||testUnit===t.unit))b.setAttribute('aria-current','page');$('lesson-pages').append(b)});
  $('lesson-next').disabled=l.number===64;requestAnimationFrame(applyZoom);
 }
@@ -161,18 +177,18 @@ function loadInlineTrack(id){
  const track=inlineTracks().find(t=>t.id===id);if(!track)return;
  $('audio-track').value=id;$('audio-drive-link').href='https://drive.google.com/file/d/'+id+'/view';save('odf1-audio-'+inlineScope,id);
  if(inlineTrack===id&&$('audio-inline-host').firstChild)return;
- inlineTrack=id;const frame=document.createElement('iframe');frame.src='https://drive.google.com/file/d/'+id+'/preview';frame.title=bookName()+' · Audio '+track.code;frame.allow='autoplay';$('audio-inline-host').replaceChildren(frame);
+ inlineTrack=id;const frame=document.createElement('iframe');frame.src='https://drive.google.com/file/d/'+id+'/preview?hl=en';frame.title=bookName()+' · Audio '+track.code;frame.allow='autoplay';$('audio-inline-host').replaceChildren(frame);
 }
-function selectInlineAudio(id){inlineOpen=true;$('audio-dock').hidden=false;$('audio-dock').classList.remove('minimized');$('audio-minimize').textContent='−';$('audio-minimize').setAttribute('aria-label','Thu gọn audio');$('audio-toggle').setAttribute('aria-expanded','true');loadInlineTrack(id)}
-function closeInlineAudio(){inlineOpen=false;$('audio-inline-host').replaceChildren();inlineTrack='';$('audio-dock').hidden=true;$('audio-toggle').setAttribute('aria-expanded','false')}
+function selectInlineAudio(id){inlineOpen=true;$('audio-dock').hidden=false;$('audio-dock').classList.remove('minimized');$('audio-minimize').textContent='−';$('audio-minimize').setAttribute('aria-label','Minimize audio');$('audio-toggle').setAttribute('aria-expanded','true');loadInlineTrack(id)}
+function closeInlineAudio(){inlineOpen=false;$('audio-inline-host').replaceChildren();inlineTrack='';$('audio-dock').hidden=true;$('audio-toggle').setAttribute('aria-expanded','false');if($('audio-dock').contains(document.activeElement)&&audioOpener?.isConnected)audioOpener.focus({preventScroll:true})}
 function updatePanControls(){const stage=$('page-stage'),overflow=stage.scrollWidth>stage.clientWidth+2;$('pan-controls').hidden=!overflow;$('pan-left').disabled=stage.scrollLeft<=1;$('pan-right').disabled=stage.scrollLeft>=stage.scrollWidth-stage.clientWidth-1}
 function initializeClassroom(){
  activeLesson=Number(read('odf1-active-lesson'))||null;lessonPhase=['review','main','homework'].includes(read('odf1-lesson-phase'))?read('odf1-lesson-phase'):'review';
- C.lessons.forEach(l=>$('active-lesson').append(option(l.number,'Buổi '+l.number)));
+ C.lessons.forEach(l=>$('active-lesson').append(option(l.number,'Lesson '+l.number)));
  $('active-lesson').onchange=e=>startLesson(e.target.value);$('lesson-review').onclick=()=>openLessonPhase('review');$('lesson-main').onclick=()=>openLessonPhase('main');$('lesson-homework').onclick=()=>openLessonPhase('homework');$('lesson-next').onclick=()=>startLesson(activeLesson+1);$('lesson-exit').onclick=()=>{activeLesson=null;saveLesson();renderLessonBar()};
  $('lesson-open').onclick=()=>{openPanel('sidebar');showNav(true);$('nav-lessons').focus()};
  $('audio-track').onchange=e=>selectInlineAudio(e.target.value);$('audio-close').onclick=closeInlineAudio;$('audio-toggle').onclick=()=>inlineOpen?closeInlineAudio():selectInlineAudio($('audio-track').value);
- $('audio-minimize').onclick=()=>{const minimized=$('audio-dock').classList.toggle('minimized');$('audio-minimize').textContent=minimized?'+':'−';$('audio-minimize').setAttribute('aria-label',minimized?'Mở rộng audio':'Thu gọn audio')};
+ $('audio-minimize').onclick=()=>{const minimized=$('audio-dock').classList.toggle('minimized');$('audio-minimize').textContent=minimized?'+':'−';$('audio-minimize').setAttribute('aria-label',minimized?'Expand audio':'Minimize audio')};
  const stage=$('page-stage');let drag=null;
  stage.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0||e.target.closest('button,a,input,select'))return;e.preventDefault();stage.focus({preventScroll:true});drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:stage.scrollLeft,top:stage.scrollTop};stage.setPointerCapture(e.pointerId);stage.classList.add('dragging')});
  stage.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;stage.scrollLeft=drag.left+drag.x-e.clientX;stage.scrollTop=drag.top+drag.y-e.clientY});
@@ -182,7 +198,7 @@ function initializeClassroom(){
 }
 
 $('book').onchange=e=>switchBook(e.target.value);$('test-unit').onchange=e=>switchBook('test',1,e.target.value);$('unit-test').onclick=()=>switchBook('test',1,unit());
-for(let u=1;u<=10;u++){$('test-unit').append(option(u,'Unit '+u));$('lesson-unit').append(option(u,'Unit '+u))}$('lesson-unit').append(option('extra','Ôn tập & phỏng vấn'));
+for(let u=1;u<=10;u++){$('test-unit').append(option(u,'Unit '+u));$('lesson-unit').append(option(u,'Unit '+u))}$('lesson-unit').append(option('extra','Revision & interviews'));
 $('nav-units').onclick=()=>showNav(false);$('nav-lessons').onclick=()=>showNav(true);$('lesson-unit').onchange=renderLessons;
 $('answers-open').onclick=openAnswers;$('answer-section').onchange=renderAnswers;$('answers-close').onclick=()=>$('answers').close();$('answers').addEventListener('close',()=>{$('answer-images').replaceChildren();$('answers-open').focus()});
 $('player-close').onclick=()=>$('player').close();$('player').addEventListener('close',stopMedia);$('player').addEventListener('cancel',stopMedia);
@@ -192,10 +208,10 @@ $('prev').onclick=()=>go(page-1);$('next').onclick=()=>go(page+1);$('page').onch
 $('zoom-in').onclick=()=>setZoom(zoom+.25);$('zoom-out').onclick=()=>setZoom(zoom-.25);$('zoom-reset').onclick=()=>setZoom(1);$('fit-mode').onchange=()=>{setZoom(1);$('page-stage').scrollTo(0,0)};
 $('page-image').onerror=()=>{const im=$('page-image');if(book!=='test'&&im.dataset.fallback!=='true'){im.dataset.fallback='true';im.src=(book==='sb'?'pages/':'workbook/')+String(page).padStart(3,'0')+'.webp'}else $('image-error').hidden=false};$('page-image').onload=()=>{$('image-error').hidden=true;applyZoom()};$('retry').onclick=()=>{$('page-image').src=pagePath(page)+'?retry='+Date.now()};
 $('hide-controls').onclick=()=>setControlsHidden(true);$('show-controls').onclick=()=>setControlsHidden(false);$('fullscreen').onclick=toggleFullscreen;
-document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('fullscreen').setAttribute('aria-label',active?'Thoát toàn màn hình':'Toàn màn hình');$('fullscreen').title=active?'Thoát toàn màn hình (F hoặc Esc)':'Toàn màn hình (F)';setControlsHidden(active)});
+document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('fullscreen').setAttribute('aria-label',active?'Exit fullscreen':'Fullscreen');$('fullscreen').title=active?'Exit fullscreen (F or Esc)':'Fullscreen (F)';setControlsHidden(active)});
 document.addEventListener('keydown',e=>{
  if($('player').open||$('answers').open)return;
- if(e.key==='Escape'){closePanels();if(document.body.classList.contains('controls-hidden'))setControlsHidden(false);return}
+ if(e.key==='Escape'){closePanels();if(inlineOpen)closeInlineAudio();if(document.body.classList.contains('controls-hidden'))setControlsHidden(false);return}
  if(e.ctrlKey||e.metaKey||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
  if(e.altKey){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();go(page+(e.key==='ArrowRight'?1:-1))}return}
  if(e.key.toLowerCase()==='h'){e.preventDefault();setControlsHidden(!document.body.classList.contains('controls-hidden'))}

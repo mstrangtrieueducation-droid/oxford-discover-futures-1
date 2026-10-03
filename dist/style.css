@@ -42,6 +42,12 @@ body.controls-hidden .toolbar{display:none}
 #page-stage{cursor:grab;touch-action:pan-x pan-y pinch-zoom;overflow-anchor:none}
 #page-stage.dragging,#page-stage.dragging *{cursor:grabbing!important}
 #page-image{user-select:none;-webkit-user-drag:none}
+#page-hotspots{position:absolute;inset:0;pointer-events:none}
+.page-hotspot{position:absolute;transform:translate(-50%,-50%);width:2.6%;min-width:26px;min-height:0;aspect-ratio:1;padding:0;display:grid;place-items:center;border:2px solid white;border-radius:50%;background:#087b83;color:white;box-shadow:0 0 0 2px #087b8399,0 2px 6px #001c3433;pointer-events:auto;cursor:pointer;line-height:1}
+.page-hotspot.compact{width:1.6%;min-width:16px;border-width:1px;box-shadow:0 0 0 1px #087b83}
+.page-hotspot svg{display:block;width:65%;height:65%}.page-hotspot.video{background:#bd4937;box-shadow:0 0 0 2px #bd493799}
+.page-hotspot:hover,.page-hotspot:focus-visible{background:#004c58;outline:3px solid #f1c646;outline-offset:3px}
+.page-hotspot.unavailable{background:#697b89;box-shadow:0 0 0 1px #697b89;cursor:help}
 #pan-controls{position:fixed;left:12px;bottom:12px;display:flex;align-items:center;gap:6px;background:#ffffffed;border-radius:9px;box-shadow:0 2px 12px #17324e22;padding:4px;z-index:21}
 #pan-controls span{font-size:12px;color:#537088;padding:0 6px}#pan-controls button{min-height:32px;padding:4px 12px}
 #lesson-bar{display:flex;align-items:center;gap:5px;flex:0 0 auto;background:#eaf6f5;padding:4px 8px;border-bottom:1px solid #c9dfdf;overflow-x:auto;white-space:nowrap;scrollbar-width:thin}

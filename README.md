@@ -21,12 +21,16 @@ Push this directory to a GitHub repository with the default branch `main`. In Se
 - Presentation layout: full-width reading area, on-demand contents/media drawers, hideable toolbar and fullscreen control. Choose fit-width for large text or fit-page for the whole page; H toggles controls, F toggles fullscreen, mouse wheel zooms around the pointer and left-button dragging pans both axes. Shift+wheel pans horizontally. Left/right arrows pan when enlarged; Alt+left/right always turn pages.
 - 10 unit navigation entries; page numbers match the printed book where present.
 - 65 Student Book audio entries (64 tracks and the copyright recording).
-- 31 videos mapped by the Unit number in their filenames.
-- Audio selected by the exact printed track code. Audio is not automatically mapped to individual pages.
-- Audio loads in a small embedded Drive player when the book opens. Selecting another page in the same book preserves playback; minimize keeps playing, close stops it. Track selection follows printed codes and stays available in the collapsed player. Video remains in a modal and stops audio before opening; closing the video removes its iframe.
+- 31 videos linked directly at their corresponding printed video icons: Factflix, Reflect with/without narration, and the Memory Experiment.
+- Audio selected by the exact printed track code. All 64 Student Book tracks are linked at their printed icons, including the vocabulary and Literature pages. Workbook and test listening badges are linked too.
+- The audio player starts hidden. Click a play hotspot on the printed speaker icon to open the matching Drive track. The first audio track on the current page preloads invisibly without autoplay. Selecting another page in the same book preserves playback; minimize keeps playing, close stops it. Track selection follows printed codes and stays available in the collapsed player. Video remains in a modal and stops audio before opening; closing the video removes its iframe.
 - Start a lesson to open previous-lesson Workbook correction first, then switch to the main lesson and today’s homework. Every assigned page has a direct shortcut. Missing assignments in the source Program are explicitly left unspecified.
 - Last page stored only in this browser; no login, analytics, or student data collection.
 
 The supplied book and media retain their original ownership and copyright. This project includes no license grant for those materials. The full Teacher Guide is not published. Tests and answer keys are included at the user's request; hiding answers is a presentation feature, not access control.
+
+The app interface, lesson workflow, help, and media labels are in English. Google Drive owns its embedded player UI and may follow the viewer’s Google account language.
+
+Workbook page 89 prints audio 9.02, which is absent from the supplied media inventory and the Drive searches. Its hotspot is marked unavailable instead of opening the wrong recording. All other supplied audio and video are mapped.
 
 Google Drive controls media playback availability. Each player also provides a direct Drive link if browser playback is unavailable.
