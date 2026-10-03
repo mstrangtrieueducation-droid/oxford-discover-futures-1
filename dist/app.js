@@ -28,7 +28,7 @@ function switchBook(next,n,u=unit()){
 function go(n,updateHash=true){
  n=Number(n);if(!Number.isInteger(n)||n<1||n>total())return;page=n;
  const u=unit();$('page').value=page;$('section-label').textContent=bookName();$('section-title').textContent=chapters[u-1][2];
- $('page-image').dataset.fallback='false';$('page-image').src=pagePath(page);$('page-image').alt=bookName()+' · Page '+label(page);$('image-error').hidden=true;
+ $('page-wrap').classList.add('loading');$('page-image').dataset.fallback='false';$('page-image').src=pagePath(page);$('page-image').alt=bookName()+' · Page '+label(page);$('image-error').hidden=true;
  $('page-status').textContent=bookName()+' · Page '+label(page)+' · '+page+'/'+total();
  $('prev').disabled=page===1;$('next').disabled=page===total();$('unit-test').textContent='Test U'+u;
  $('answers-open').disabled=book==='wb'&&(page<4||page>=114);
@@ -206,7 +206,7 @@ for(const id of ['player','answers'])$(id).addEventListener('click',e=>{if(e.tar
 $('menu').onclick=()=>openPanel('sidebar');$('media-open').onclick=()=>openPanel('resources');$('sidebar-close').onclick=closePanels;$('resources-close').onclick=closePanels;$('scrim').onclick=closePanels;
 $('prev').onclick=()=>go(page-1);$('next').onclick=()=>go(page+1);$('page').onchange=e=>go(e.target.value);$('contents').onclick=()=>{go(book==='test'?1:3);closePanels()};$('audio-search').oninput=renderAudio;
 $('zoom-in').onclick=()=>setZoom(zoom+.25);$('zoom-out').onclick=()=>setZoom(zoom-.25);$('zoom-reset').onclick=()=>setZoom(1);$('fit-mode').onchange=()=>{setZoom(1);$('page-stage').scrollTo(0,0)};
-$('page-image').onerror=()=>{const im=$('page-image');if(book!=='test'&&im.dataset.fallback!=='true'){im.dataset.fallback='true';im.src=(book==='sb'?'pages/':'workbook/')+String(page).padStart(3,'0')+'.webp'}else $('image-error').hidden=false};$('page-image').onload=()=>{$('image-error').hidden=true;applyZoom()};$('retry').onclick=()=>{$('page-image').src=pagePath(page)+'?retry='+Date.now()};
+$('page-image').onerror=()=>{const im=$('page-image');if(book!=='test'&&im.dataset.fallback!=='true'){im.dataset.fallback='true';im.src=(book==='sb'?'pages/':'workbook/')+String(page).padStart(3,'0')+'.webp'}else $('image-error').hidden=false};$('page-image').onload=()=>{$('page-wrap').classList.remove('loading');$('image-error').hidden=true;applyZoom()};$('retry').onclick=()=>{$('page-image').src=pagePath(page)+'?retry='+Date.now()};
 $('hide-controls').onclick=()=>setControlsHidden(true);$('show-controls').onclick=()=>setControlsHidden(false);$('fullscreen').onclick=toggleFullscreen;
 document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('fullscreen').setAttribute('aria-label',active?'Exit fullscreen':'Fullscreen');$('fullscreen').title=active?'Exit fullscreen (F or Esc)':'Fullscreen (F)';setControlsHidden(active)});
 document.addEventListener('keydown',e=>{

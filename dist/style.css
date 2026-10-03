@@ -43,6 +43,8 @@ body.controls-hidden .toolbar{display:none}
 #page-stage.dragging,#page-stage.dragging *{cursor:grabbing!important}
 #page-image{user-select:none;-webkit-user-drag:none}
 #page-hotspots{position:absolute;inset:0;pointer-events:none}
+#page-wrap.loading #page-image,#page-wrap.loading #page-hotspots{visibility:hidden}
+#page-wrap.loading:before{content:'Loading page…';position:absolute;top:24px;left:24px;font-size:14px;line-height:1.5;color:#466678}
 .page-hotspot{position:absolute;transform:translate(-50%,-50%);width:2.6%;min-width:26px;min-height:0;aspect-ratio:1;padding:0;display:grid;place-items:center;border:2px solid white;border-radius:50%;background:#087b83;color:white;box-shadow:0 0 0 2px #087b8399,0 2px 6px #001c3433;pointer-events:auto;cursor:pointer;line-height:1}
 .page-hotspot.compact{width:1.6%;min-width:16px;border-width:1px;box-shadow:0 0 0 1px #087b83}
 .page-hotspot svg{display:block;width:65%;height:65%}.page-hotspot.video{background:#bd4937;box-shadow:0 0 0 2px #bd493799}
